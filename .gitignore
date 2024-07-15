@@ -2,4 +2,4 @@ checkpoints/*
 errors
 outputs
 submit_job.sh
-
+visual_embed/mae_visualize_vit_large.pth
