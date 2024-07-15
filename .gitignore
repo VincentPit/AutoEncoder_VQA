@@ -1,0 +1,5 @@
+checkpoints/*
+errors
+outputs
+submit_job.sh
+
