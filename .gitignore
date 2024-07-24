@@ -1,5 +1,8 @@
 checkpoints/*
 errors
 outputs
-submit_job.sh
+submit_job_parra.sh
 visual_embed/mae_visualize_vit_large.pth
+dataset
+multimodal_model.pth
+environment.yml

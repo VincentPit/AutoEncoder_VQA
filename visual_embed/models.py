@@ -1,6 +1,5 @@
 import sys
 import os
-import matplotlib.pyplot as plt
 from PIL import Image
 import requests
 import numpy as np
@@ -37,14 +36,6 @@ img = (img - imagenet_mean) / imagenet_std
 # Ensure image data is in the range [0, 1] for visualization
 img_for_display = img * imagenet_std + imagenet_mean
 img_for_display = np.clip(img_for_display, 0, 1)
-
-plt.rcParams['figure.figsize'] = [5, 5]
-
-def show_image(img):
-    plt.imshow(img.permute(1, 2, 0).cpu().numpy())
-    plt.show()
-
-show_image(torch.tensor(img_for_display).permute(2, 0, 1))
 
 class MAEEncoder(nn.Module):
     def __init__(self, patch_embed, cls_token, pos_embed, blocks, norm):
