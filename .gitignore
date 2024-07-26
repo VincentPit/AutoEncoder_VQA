@@ -6,3 +6,5 @@ visual_embed/mae_visualize_vit_large.pth
 dataset
 multimodal_model.pth
 environment.yml
+submit_job_mono.sh
+submit_job_parra_ddp.sh
