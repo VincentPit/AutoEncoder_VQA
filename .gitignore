@@ -8,3 +8,6 @@ multimodal_model.pth
 environment.yml
 submit_job_mono.sh
 submit_job_parra_ddp.sh
+submit_job_cross_mono.sh
+submit_job_para_cross.sh
+submit_job_cross_attention_mono.sh

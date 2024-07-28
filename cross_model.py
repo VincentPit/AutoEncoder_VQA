@@ -27,18 +27,28 @@ class MultiModalModel(nn.Module):
         text_outputs = self.bert_model(input_ids=text_input_ids, attention_mask=text_attention_mask)
         text_embeddings = text_outputs.last_hidden_state  # Shape: [batch_size, seq_len, 768]
         text_embeddings = self.bert_proj(text_embeddings)  # Shape: [batch_size, seq_len, 1024]
-        print("Text Embedding Shape:", text_embeddings.shape)
+        #print("Text Embedding Shape:", text_embeddings.shape)
 
         # Get ViT embeddings
         image_embeddings = self.vit_model.forward(image_tensor)  # Shape: [batch_size, 197, 1024]
-        print("Image Embedding Shape:", image_embeddings.shape)
+        #print("Image Embedding Shape:", image_embeddings.shape)
 
-        # Concatenate along the sequence dimension
-        combined_embeddings = torch.cat((text_embeddings, image_embeddings), dim=1)  # Shape: [batch_size, seq_len + 197, 1024]
-        print("Combined Embedding Shape:", combined_embeddings.shape)
+        # Align the dimensions
+        if text_embeddings.size(1) > image_embeddings.size(1):
+            diff = text_embeddings.size(1) - image_embeddings.size(1)
+            padding = torch.zeros((image_embeddings.size(0), diff, image_embeddings.size(2))).to(image_embeddings.device)
+            image_embeddings = torch.cat([image_embeddings, padding], dim=1)
+        elif image_embeddings.size(1) > text_embeddings.size(1):
+            diff = image_embeddings.size(1) - text_embeddings.size(1)
+            padding = torch.zeros((text_embeddings.size(0), diff, text_embeddings.size(2))).to(text_embeddings.device)
+            text_embeddings = torch.cat([text_embeddings, padding], dim=1)
+
+        # Multiply embeddings element-wise
+        combined_embeddings = text_embeddings * image_embeddings  # Element-wise multiplication
+        #print("Combined Embedding Shape:", combined_embeddings.shape)
 
         # Pass through transformer encoder layers
-        encoder_output = self.transformer_encoder(combined_embeddings)  # Shape: [batch_size, seq_len + 197, 1024]
+        encoder_output = self.transformer_encoder(combined_embeddings)  # Shape: [batch_size, seq_len, 1024]
 
         # Prepare decoder input embeddings
         decoder_embeddings = self.embedding(decoder_input_ids)  # Shape: [batch_size, target_seq_len, 1024]
