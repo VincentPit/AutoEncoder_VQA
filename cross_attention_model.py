@@ -19,6 +19,8 @@ class MultiModalModel(nn.Module):
         decoder_layer = nn.TransformerDecoderLayer(d_model=1024, nhead=8, batch_first=True)
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
 
+        self.cross_attention = nn.MultiheadAttention(embed_dim=1024, num_heads=8, batch_first=True)
+
         self.embedding = nn.Embedding(vocab_size, 1024)
         self.fc_out = nn.Linear(1024, vocab_size)
 
@@ -27,11 +29,9 @@ class MultiModalModel(nn.Module):
         text_outputs = self.bert_model(input_ids=text_input_ids, attention_mask=text_attention_mask)
         text_embeddings = text_outputs.last_hidden_state  # Shape: [batch_size, seq_len, 768]
         text_embeddings = self.bert_proj(text_embeddings)  # Shape: [batch_size, seq_len, 1024]
-        #print("Text Embedding Shape:", text_embeddings.shape)
 
         # Get ViT embeddings
         image_embeddings = self.vit_model.forward(image_tensor)  # Shape: [batch_size, 197, 1024]
-        #print("Image Embedding Shape:", image_embeddings.shape)
 
         # Align the dimensions
         if text_embeddings.size(1) > image_embeddings.size(1):
@@ -43,8 +43,8 @@ class MultiModalModel(nn.Module):
             padding = torch.zeros((text_embeddings.size(0), diff, text_embeddings.size(2))).to(text_embeddings.device)
             text_embeddings = torch.cat([text_embeddings, padding], dim=1)
 
-        # Multiply embeddings element-wise
-        combined_embeddings = text_embeddings * image_embeddings  # Element-wise multiplication
+        # Cross attention mechanism
+        combined_embeddings, _ = self.cross_attention(text_embeddings, image_embeddings, image_embeddings)
         #print("Combined Embedding Shape:", combined_embeddings.shape)
 
         # Pass through transformer encoder layers
