@@ -5,13 +5,14 @@ from torch.utils.data import DataLoader
 from transformers import BertTokenizer, BertModel
 from torchvision import transforms
 from tqdm import tqdm
+from torch.optim.lr_scheduler import StepLR
 
 # Import custom models and DataLoader
 from cross_attention_model import MultiModalModel
 from dataloader import VQADataset 
 from visual_embed.models import prepare_model
 
-def train_model(model, dataloader, optimizer, criterion, tokenizer, device):
+def train_model(model, dataloader, optimizer, criterion, tokenizer, device, clip_value=1.0):
     model.train()
     total_loss = 0
 
@@ -30,6 +31,10 @@ def train_model(model, dataloader, optimizer, criterion, tokenizer, device):
         
         loss = criterion(output.view(-1, output.size(-1)), target.view(-1))
         loss.backward()
+
+        # Gradient clipping
+        torch.nn.utils.clip_grad_norm_(model.parameters(), clip_value)
+        
         optimizer.step()
         
         total_loss += loss.item()
@@ -72,11 +77,15 @@ if __name__ == "__main__":
     criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
+    # Learning rate scheduler
+    scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
+
     # Training loop
     num_epochs = 100
     for epoch in range(num_epochs):
         print(f"Epoch {epoch+1}/{num_epochs}")
         avg_loss = train_model(model, dataloader, optimizer, criterion, tokenizer, device)
+        scheduler.step()
         print(f"Loss: {avg_loss:.4f}")
 
     # Save the trained model
