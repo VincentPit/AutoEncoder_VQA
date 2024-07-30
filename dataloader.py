@@ -30,19 +30,34 @@ class VQADataset(Dataset):
         if self.transform:
             image = self.transform(image)
 
+        # Define max length for padding
+        max_length = 32  # Adjust as needed for your data
+
         # Tokenize the question and answer
-        question_tokenized = self.tokenizer(question, return_tensors="pt", padding='max_length', max_length=512, truncation=True)
-        answer_tokenized = self.tokenizer(answer, return_tensors="pt", padding='max_length', max_length=512, truncation=True)
+        question_tokenized = self.tokenizer(question, return_tensors="pt", padding=False, max_length=max_length, truncation=True)
+        answer_tokenized = self.tokenizer(answer, return_tensors="pt", padding=False, max_length=max_length, truncation=True)
+
+        # Pad sequences to the fixed max length
+        question_padded = pad_sequence(question_tokenized['input_ids'].squeeze(), max_length)
+        answer_padded = pad_sequence(answer_tokenized['input_ids'].squeeze(), max_length)
 
         sample = {
-            'question': question_tokenized['input_ids'].squeeze(),
-            'answer': answer_tokenized['input_ids'].squeeze(),
+            'question': question_padded,
+            'answer': answer_padded,
             'image': image,
             'question_text': question,
             'answer_text': answer,
             'img_id': img_id
         }
         return sample
+    
+
+def pad_sequence(sequence, max_length, padding_value=0):
+    padded_sequence = torch.full((max_length,), padding_value)
+    length = min(len(sequence), max_length)
+    padded_sequence[:length] = sequence[:length]
+    return padded_sequence
+
 
 def save_samples(batch, save_dir):
     os.makedirs(save_dir, exist_ok=True)

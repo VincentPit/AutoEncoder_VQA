@@ -1,0 +1,2 @@
+Question: how many window casing
+Answer: 3

@@ -81,7 +81,7 @@ if __name__ == "__main__":
     scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
 
     # Training loop
-    num_epochs = 100
+    num_epochs = 10
     for epoch in range(num_epochs):
         print(f"Epoch {epoch+1}/{num_epochs}")
         avg_loss = train_model(model, dataloader, optimizer, criterion, tokenizer, device)
@@ -89,4 +89,4 @@ if __name__ == "__main__":
         print(f"Loss: {avg_loss:.4f}")
 
     # Save the trained model
-    torch.save(model.state_dict(), 'cross_attention_multimodal_model.pth')
+    torch.save(model.state_dict(), 'cross_attention_multimodal_model10.pth')
