@@ -1,0 +1,2 @@
+Question: what is the object right of the table in the middle of the room
+Answer: room_divider

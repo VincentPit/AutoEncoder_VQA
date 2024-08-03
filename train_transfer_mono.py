@@ -8,10 +8,11 @@ from tqdm import tqdm
 from torch.optim.lr_scheduler import StepLR
 from PIL import Image
 import os
+import random
 
 # Import custom models and DataLoader
-from cross_attention_model import MultiModalModel
-from dataloader import VQADataset 
+from transfer_cross_attention_model import MultiModalModel
+from dataloader import VQADataset
 from visual_embed.models import prepare_model
 
 def train_model(model, dataloader, optimizer, criterion, tokenizer, device, clip_value=1.0):
@@ -127,22 +128,24 @@ if __name__ == "__main__":
     evaluate_initial_model(model, eval_dataloader, tokenizer, img_dir, device)
 
     # Training loop
-    num_epochs = 10
+    num_epochs = 100
     for epoch in range(num_epochs):
         print(f"Epoch {epoch+1}/{num_epochs}")
         avg_loss = train_model(model, train_dataloader, optimizer, criterion, tokenizer, device)
         scheduler.step()
         print(f"Loss: {avg_loss:.4f}")
 
-        # Generate and print answer for the first example in the eval dataset
-        eval_example = next(iter(eval_dataloader))
-        image_path = os.path.join(img_dir, f"{eval_example['img_id'][0]}.png")
-        question = eval_example['question_text'][0]
+        # Generate and print answer for five random examples in the eval dataset
+        eval_indices = random.sample(range(len(eval_dataloader.dataset)), 5)
+        for idx in eval_indices:
+            eval_example = eval_dataloader.dataset[idx]
+            image_path = os.path.join(img_dir, f"{eval_example['img_id']}.png")
+            question = eval_example['question_text']
         
-        answer = generate_answer(model, tokenizer, image_path, question, device)
+            answer = generate_answer(model, tokenizer, image_path, question, device)
         
-        print(f"Evaluation example - Question: {question}")
-        print(f"Generated Answer: {answer}")
+            print(f"Evaluation example - Question: {question}")
+            print(f"Generated Answer: {answer}")
 
     # Save the trained model
-    torch.save(model.state_dict(), 'cross_attention10.pth')
+    torch.save(model.state_dict(), 'transfer_cross_attention10.pth')

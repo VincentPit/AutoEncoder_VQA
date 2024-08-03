@@ -1,0 +1,2 @@
+Question: what is on the table
+Answer: bottle_of_liquid, perfume, cream

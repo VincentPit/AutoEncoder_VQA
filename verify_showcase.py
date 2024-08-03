@@ -8,7 +8,7 @@ from cross_attention_model import MultiModalModel
 from visual_embed.models import prepare_model
 import os
 
-def load_model(model_path, device):
+def initialize_model(device):
     # Initialize BERT and ViT models
     bert_model = BertModel.from_pretrained('bert-base-uncased').to(device)
     vit_model = prepare_model(chkpt_dir='visual_embed/mae_visualize_vit_large.pth', arch='mae_vit_large_patch16', only_encoder=True).to(device)
@@ -18,9 +18,6 @@ def load_model(model_path, device):
     # Create an instance of the multimodal model
     model = MultiModalModel(bert_model, vit_model, tokenizer, vocab_size)
     model.to(device)
-
-    # Load trained model parameters
-    model.load_state_dict(torch.load(model_path, map_location=device))
 
     return model, tokenizer
 
@@ -68,9 +65,8 @@ def save_result(image_path, question, answer, save_dir):
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model_path = 'cross_attention10.pth'
-    print("Model_path:", model_path)
-    model, tokenizer = load_model(model_path, device)
+    print("Initializing model...")
+    model, tokenizer = initialize_model(device)
     
     # Provide image path and question
     image_path = 'saved_samples/image868.png'

@@ -12,3 +12,7 @@ submit_job_cross_mono.sh
 submit_job_para_cross.sh
 submit_job_cross_attention_mono.sh
 cross_attention_multimodal_model.pth
+submit_job_transfer.sh
+cross_attention10.pth 
+cross_attention_multimodal_model10.pth
+transfer_cross_attention10.pth

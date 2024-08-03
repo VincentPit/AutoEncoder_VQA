@@ -5,6 +5,8 @@ from PIL import Image
 import os
 from transformers import BertTokenizer
 from torchvision import transforms
+from collections import Counter
+import matplotlib.pyplot as plt
 
 class VQADataset(Dataset):
     def __init__(self, csv_file, img_dir, tokenizer, transform=None):
@@ -12,6 +14,33 @@ class VQADataset(Dataset):
         self.img_dir = img_dir
         self.tokenizer = tokenizer
         self.transform = transform
+        
+        # Determine the maximum lengths for questions and answers
+        self.max_question_length = 0
+        self.max_answer_length = 0
+        question_lengths = []
+        answer_lengths = []
+        empty_answers = 0
+
+        for idx in range(len(self.data)):
+            question = self.data.iloc[idx, 0]
+            answer = self.data.iloc[idx, 1]
+            
+            if pd.isna(answer) or answer.strip() == "":
+                empty_answers += 1
+
+            question_tokenized = tokenizer(question, return_tensors="pt", padding=False, truncation=True)['input_ids'].squeeze()
+            answer_tokenized = tokenizer(answer, return_tensors="pt", padding=False, truncation=True)['input_ids'].squeeze()
+            
+            question_lengths.append(len(question_tokenized))
+            answer_lengths.append(len(answer_tokenized))
+            
+            self.max_question_length = max(self.max_question_length, len(question_tokenized))
+            self.max_answer_length = max(self.max_answer_length, len(answer_tokenized))
+        
+        print(f"Empty answers: {empty_answers}")
+        self.plot_length_distribution(question_lengths, 'Question Lengths')
+        self.plot_length_distribution(answer_lengths, 'Answer Lengths')
 
     def __len__(self):
         return len(self.data)
@@ -30,16 +59,13 @@ class VQADataset(Dataset):
         if self.transform:
             image = self.transform(image)
 
-        # Define max length for padding
-        max_length = 32  # Adjust as needed for your data
-
         # Tokenize the question and answer
-        question_tokenized = self.tokenizer(question, return_tensors="pt", padding=False, max_length=max_length, truncation=True)
-        answer_tokenized = self.tokenizer(answer, return_tensors="pt", padding=False, max_length=max_length, truncation=True)
+        question_tokenized = self.tokenizer(question, return_tensors="pt", padding=False, truncation=True)['input_ids'].squeeze()
+        answer_tokenized = self.tokenizer(answer, return_tensors="pt", padding=False, truncation=True)['input_ids'].squeeze()
 
-        # Pad sequences to the fixed max length
-        question_padded = pad_sequence(question_tokenized['input_ids'].squeeze(), max_length)
-        answer_padded = pad_sequence(answer_tokenized['input_ids'].squeeze(), max_length)
+        # Pad sequences to the maximum lengths determined
+        question_padded = self.pad_sequence(question_tokenized, self.max_question_length)
+        answer_padded = self.pad_sequence(answer_tokenized, self.max_answer_length)
 
         sample = {
             'question': question_padded,
@@ -49,15 +75,22 @@ class VQADataset(Dataset):
             'answer_text': answer,
             'img_id': img_id
         }
+        
         return sample
-    
 
-def pad_sequence(sequence, max_length, padding_value=0):
-    padded_sequence = torch.full((max_length,), padding_value)
-    length = min(len(sequence), max_length)
-    padded_sequence[:length] = sequence[:length]
-    return padded_sequence
+    def pad_sequence(self, sequence, max_len, padding_value=0):
+        if len(sequence) < max_len:
+            sequence = torch.cat([sequence, torch.full((max_len - len(sequence),), padding_value)])
+        return sequence[:max_len]
 
+    def plot_length_distribution(self, lengths, title):
+        counter = Counter(lengths)
+        lengths, counts = zip(*counter.items())
+        plt.bar(lengths, counts)
+        plt.title(title)
+        plt.xlabel('Length')
+        plt.ylabel('Count')
+        plt.show()
 
 def save_samples(batch, save_dir):
     os.makedirs(save_dir, exist_ok=True)
@@ -88,8 +121,10 @@ if __name__ == "__main__":
     save_dir = 'saved_samples'
 
     dataset = VQADataset(csv_file=csv_file, img_dir=img_dir, tokenizer=tokenizer, transform=transform)
+    print("Max_Question:", dataset.max_question_length)
+    print("Max_Answer:", dataset.max_answer_length)
     dataloader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=4)
-
+    
     # Example of iterating through the dataloader and saving samples
     for batch in dataloader:
         save_samples(batch, save_dir)

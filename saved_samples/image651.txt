@@ -1,0 +1,2 @@
+Question: how many drawer knobs are there
+Answer: 2
