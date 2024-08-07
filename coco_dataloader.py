@@ -1,67 +1,79 @@
-import torch
-from torch.utils.data import Dataset, DataLoader
-import pandas as pd
-from PIL import Image
 import os
+import json
+import pandas as pd
+import torch
+from PIL import Image
+from torch.utils.data import Dataset, DataLoader
 from transformers import BertTokenizer
 from torchvision import transforms
 from collections import Counter
 import matplotlib.pyplot as plt
 
 def count_data_entries(csv_file):
-    # Read the CSV file into a DataFrame
     data = pd.read_csv(csv_file)
-    # Count the number of rows in the DataFrame
-    num_entries = len(data)
-    return num_entries
+    return len(data)
 
-class VQADataset(Dataset):
-    def __init__(self, csv_file, img_dir, tokenizer, transform=None):
-        self.data = pd.read_csv(csv_file)
+def count_questions_entries(questions_file):
+    with open(questions_file, 'r') as f:
+        data = json.load(f)
+    return len(data['questions'])
+
+class CocoVQADataset(Dataset):
+    def __init__(self, img_dir, annotations_file, questions_file, tokenizer, transform=None):
         self.img_dir = img_dir
-        self.tokenizer = tokenizer
         self.transform = transform
+        self.tokenizer = tokenizer
+
+        # Load annotations and questions
+        with open(annotations_file, 'r') as f:
+            self.annotations = json.load(f)['annotations']
+        with open(questions_file, 'r') as f:
+            self.questions = json.load(f)['questions']
+        
+        # Create a dictionary to map question_id to its corresponding question
+        self.question_dict = {q['question_id']: q for q in self.questions}
         
         # Determine the maximum lengths for questions and answers
         self.max_question_length = 0
         self.max_answer_length = 0
         question_lengths = []
         answer_lengths = []
-        empty_answers = 0
 
-        for idx in range(len(self.data)):
-            question = self.data.iloc[idx, 0]
-            answer = self.data.iloc[idx, 1]
-            
-            if pd.isna(answer) or answer.strip() == "":
-                empty_answers += 1
+        for annotation in self.annotations:
+            question_id = annotation['question_id']
+            question = self.question_dict[question_id]['question']
+            answer = annotation['multiple_choice_answer']
 
             question_tokenized = tokenizer(question, return_tensors="pt", padding=False, truncation=True)['input_ids'].squeeze()
             answer_tokenized = tokenizer(answer, return_tensors="pt", padding=False, truncation=True)['input_ids'].squeeze()
-            
+
             question_lengths.append(len(question_tokenized))
             answer_lengths.append(len(answer_tokenized))
             
             self.max_question_length = max(self.max_question_length, len(question_tokenized))
             self.max_answer_length = max(self.max_answer_length, len(answer_tokenized))
-        
-        print(f"Empty answers: {empty_answers}")
+
+        print(f"Max Question Length: {self.max_question_length}")
+        print(f"Max Answer Length: {self.max_answer_length}")
+
         self.plot_length_distribution(question_lengths, 'Question Lengths')
         self.plot_length_distribution(answer_lengths, 'Answer Lengths')
 
     def __len__(self):
-        return len(self.data)
+        return len(self.annotations)
 
     def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
+        annotation = self.annotations[idx]
+        img_id = annotation['image_id']
+        question_id = annotation['question_id']
 
-        question = self.data.iloc[idx, 0]
-        answer = self.data.iloc[idx, 1]
-        img_id = self.data.iloc[idx, 2]
+        # Get the corresponding question and answer
+        question = self.question_dict[question_id]['question']
+        answer = annotation['multiple_choice_answer']
 
-        img_path = os.path.join(self.img_dir, f'{img_id}.png')
-        image = Image.open(img_path).convert('RGB')
+        # Load and process the image
+        img_name = os.path.join(self.img_dir, f'COCO_train2014_{img_id:012d}.jpg')
+        image = Image.open(img_name).convert('RGB')
 
         if self.transform:
             image = self.transform(image)
@@ -123,13 +135,12 @@ if __name__ == "__main__":
     ])
 
     # Create dataset and dataloader
-    csv_file = 'dataset/data_train.csv'
-    img_dir = 'dataset/images'
+    img_dir = 'train2014'  # Update this path to your images directory
+    annotations_file = 'v2_mscoco_train2014_annotations.json'  # Update this path to your annotations file
+    questions_file = 'v2_OpenEnded_mscoco_train2014_questions.json'  # Update this path to your questions file
     save_dir = 'saved_samples'
 
-    dataset = VQADataset(csv_file=csv_file, img_dir=img_dir, tokenizer=tokenizer, transform=transform)
-    print("Max_Question:", dataset.max_question_length)
-    print("Max_Answer:", dataset.max_answer_length)
+    dataset = CocoVQADataset(img_dir=img_dir, annotations_file=annotations_file, questions_file=questions_file, tokenizer=tokenizer, transform=transform)
     dataloader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=4)
     
     # Example of iterating through the dataloader and saving samples
@@ -137,6 +148,5 @@ if __name__ == "__main__":
         save_samples(batch, save_dir)
         break  # Save only the first batch for demonstration
     
-    csv_file = 'dataset/data_train.csv'
-    num_entries = count_data_entries(csv_file)
-    print(f"Number of data entries in the training dataset: {num_entries}")
+    num_entries = count_questions_entries(questions_file)
+    print(f"Number of question entries in the questions file: {num_entries}")

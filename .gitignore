@@ -16,3 +16,10 @@ submit_job_transfer.sh
 cross_attention10.pth 
 cross_attention_multimodal_model10.pth
 transfer_cross_attention10.pth
+v2*
+test2015
+train2014
+saved_samples
+results
+val2014
+*.pth

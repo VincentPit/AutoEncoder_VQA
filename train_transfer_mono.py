@@ -12,7 +12,7 @@ import random
 
 # Import custom models and DataLoader
 from transfer_cross_attention_model import MultiModalModel
-from dataloader import VQADataset
+from coco_dataloader import CocoVQADataset
 from visual_embed.models import prepare_model
 
 def train_model(model, dataloader, optimizer, criterion, tokenizer, device, clip_value=1.0):
@@ -68,8 +68,16 @@ def evaluate_initial_model(model, eval_dataloader, tokenizer, img_dir, device):
     print("Initial Evaluation on some QA pairs before training:")
     
     for i, eval_example in enumerate(eval_dataloader):
-        image_path = os.path.join(img_dir, f"{eval_example['img_id'][0]}.png")
+        image_path = os.path.join(img_dir, f'COCO_train2014_{eval_example["img_id"][0]:012d}.jpg')
         question = eval_example['question_text'][0]
+        
+        # Debug print
+        print(f"Checking image path: {image_path}")
+        
+        # Check if the file exists
+        if not os.path.isfile(image_path):
+            print(f"File not found: {image_path}")
+            continue  # Skip to the next example
         
         answer = generate_answer(model, tokenizer, image_path, question, device)
         
@@ -107,14 +115,19 @@ if __name__ == "__main__":
         transforms.ToTensor()
     ])
     
-    csv_file = 'dataset/data_train.csv'
-    img_dir = 'dataset/images'
-    train_dataset = VQADataset(csv_file=csv_file, img_dir=img_dir, tokenizer=tokenizer, transform=transform)
+    img_dir = 'train2014'  # Update this path to your images directory
+    annotations_file = 'v2_mscoco_train2014_annotations.json'  # Update this path to your annotations file
+    questions_file = 'v2_OpenEnded_mscoco_train2014_questions.json'  # Update this path to your questions file
+    save_dir = 'saved_samples'
+
+    train_dataset = CocoVQADataset(img_dir=img_dir, annotations_file=annotations_file, questions_file=questions_file, tokenizer=tokenizer, transform=transform)
     train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4)
 
     # Load VQA dataset for evaluation
-    eval_csv_file = 'dataset/data_eval.csv'
-    eval_dataset = VQADataset(csv_file=eval_csv_file, img_dir=img_dir, tokenizer=tokenizer, transform=transform)
+    eval_img_dir = 'train2014'  # Same as training images directory
+    eval_annotations_file = 'v2_mscoco_train2014_annotations.json'  # Update this path to your evaluation annotations file
+    eval_questions_file = 'v2_OpenEnded_mscoco_train2014_questions.json'  # Update this path to your evaluation questions file
+    eval_dataset = CocoVQADataset(img_dir=eval_img_dir, annotations_file=eval_annotations_file, questions_file=eval_questions_file, tokenizer=tokenizer, transform=transform)
     eval_dataloader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
     # Define loss criterion and optimizer
@@ -125,7 +138,7 @@ if __name__ == "__main__":
     scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
 
     # Initial evaluation before training
-    evaluate_initial_model(model, eval_dataloader, tokenizer, img_dir, device)
+    evaluate_initial_model(model, eval_dataloader, tokenizer, eval_img_dir, device)
 
     # Training loop
     num_epochs = 100
@@ -139,7 +152,7 @@ if __name__ == "__main__":
         eval_indices = random.sample(range(len(eval_dataloader.dataset)), 5)
         for idx in eval_indices:
             eval_example = eval_dataloader.dataset[idx]
-            image_path = os.path.join(img_dir, f"{eval_example['img_id']}.png")
+            image_path = os.path.join(eval_img_dir, f'COCO_train2014_{eval_example["img_id"]:012d}.jpg')
             question = eval_example['question_text']
         
             answer = generate_answer(model, tokenizer, image_path, question, device)
