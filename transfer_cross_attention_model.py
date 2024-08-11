@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
-from transformers import BertTokenizer, BertModel, BertConfig
+from transformers import BertTokenizer, BertModel
 from visual_embed.models import MAEEncoder, prepare_model
-
+from PIL import Image
+from torchvision import transforms
 
 class MultiModalModel(nn.Module):
-    def __init__(self, bert_model, vit_model, tokenizer, vocab_size, max_seq_length=512, num_cross_attention_layers=6):
+    def __init__(self, bert_model, vit_model, tokenizer, vocab_size, max_seq_length=512, num_cross_attention_layers=4):
         super(MultiModalModel, self).__init__()
         self.bert_model = bert_model
         self.vit_model = vit_model
@@ -16,6 +17,8 @@ class MultiModalModel(nn.Module):
         self.cross_attention_layers = nn.ModuleList(
             [nn.MultiheadAttention(embed_dim=1024, num_heads=8, batch_first=True) for _ in range(num_cross_attention_layers)]
         )
+
+        self.positional_encoding = nn.Parameter(torch.zeros(1, max_seq_length, 1024))  # Positional embeddings
 
         decoder_layer = nn.TransformerDecoderLayer(d_model=1024, nhead=8, batch_first=True)
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
@@ -49,7 +52,10 @@ class MultiModalModel(nn.Module):
         # Apply cross attention layers
         for cross_attention in self.cross_attention_layers:
             combined_embeddings, _ = cross_attention(text_embeddings, image_embeddings, combined_embeddings)
-        
+
+        # Add positional embeddings to the combined embeddings
+        combined_embeddings += self.positional_encoding[:, :combined_embeddings.size(1), :]
+
         # Prepare decoder input embeddings
         decoder_embeddings = self.embedding(decoder_input_ids.to(device))  # Shape: [batch_size, target_seq_len, 1024]
 
@@ -87,6 +93,16 @@ class MultiModalModel(nn.Module):
         return generated_answer
 
 
+def preprocess_image(image_path):
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    image = Image.open(image_path).convert("RGB")
+    image = transform(image)
+    return image.unsqueeze(0)  # Add batch dimension
+
 if __name__ == "__main__":
     # Initialize BERT and ViT models
     bert_model = BertModel.from_pretrained('bert-base-uncased')
@@ -97,24 +113,59 @@ if __name__ == "__main__":
     # Create an instance of your multimodal model
     model = MultiModalModel(bert_model, vit_model, tokenizer, vocab_size)
 
-    # Example input tensors (adjust according to your actual data)
-    text_input_ids = torch.tensor([[101, 2023, 2003, 1037, 2518, 2003, 1037, 2062, 1010, 102]])
-    text_attention_mask = torch.ones_like(text_input_ids)
-    image_tensor = torch.randn(1, 3, 224, 224)  # Example image tensor
+    # Example image paths and questions
+    image_paths = [
+        "train2014/COCO_train2014_000000458752.jpg",
+        "train2014/COCO_train2014_000000262146.jpg"
+    ]
+    questions = [
+        "What is this photo taken looking through?",
+        "What position is this man playing?",
+        "What color is the players shirt?",
+        "Is this man a professional baseball player?",
+        "What color is the snow?"
+    ]
 
-    # Move everything to the same device
+    # Move model to the appropriate device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
-    text_input_ids = text_input_ids.to(device)
-    text_attention_mask = text_attention_mask.to(device)
-    image_tensor = image_tensor.to(device)
 
-    # Ensure the model is in evaluation mode
-    model.eval()
+    for image_path in image_paths:
+        for question in questions:
+            # Preprocess inputs
+            text_input_ids = tokenizer.encode(question, return_tensors="pt")
+            text_attention_mask = torch.ones_like(text_input_ids)
+            image_tensor = preprocess_image(image_path)
 
-    # Generate answer
-    with torch.no_grad():
-        answer = model.generate_answer(text_input_ids, text_attention_mask, image_tensor)
+            # Move inputs to the same device as the model
+            text_input_ids = text_input_ids.to(device)
+            text_attention_mask = text_attention_mask.to(device)
+            image_tensor = image_tensor.to(device)
 
-    # Print the generated answer
-    print("Generated Answer:", answer)
+            # Ensure the model is in evaluation mode
+            model.eval()
+
+            # Get BERT embeddings
+            with torch.no_grad():
+                text_outputs = bert_model(input_ids=text_input_ids, attention_mask=text_attention_mask)
+                text_embeddings = text_outputs.last_hidden_state  # Shape: [batch_size, seq_len, 768]
+                text_embeddings_proj = model.bert_proj(text_embeddings)  # Projected embeddings
+
+            # Get ViT embeddings
+            with torch.no_grad():
+                image_embeddings = vit_model(image_tensor)  # Shape: [batch_size, 197, 1024]
+
+            # Print BERT and ViT outputs
+            print(f"Question: {question}")
+            print(f"Image Path: {image_path}")
+            print(f"BERT Embeddings (Projected): {text_embeddings_proj.squeeze().cpu().numpy()}")
+            print(f"ViT Embeddings: {image_embeddings.squeeze().cpu().numpy()}")
+            print()
+
+            # Generate answer
+            with torch.no_grad():
+                answer = model.generate_answer(text_input_ids, text_attention_mask, image_tensor)
+
+            # Print the generated answer
+            print(f"Generated Answer: {answer}")
+            print()

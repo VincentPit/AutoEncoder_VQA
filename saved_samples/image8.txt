@@ -1,2 +1,0 @@
-Question: how many doors are opened in the room
-Answer: 1

@@ -1,2 +1,0 @@
-Question: what is the tallest object on the floor left of the bed
-Answer: lamp

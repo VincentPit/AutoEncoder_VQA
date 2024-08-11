@@ -1,2 +1,0 @@
-Question: how many pillows are there
-Answer: 4

@@ -1,2 +1,0 @@
-Question: what is on the right side wall
-Answer: light_switch

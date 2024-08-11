@@ -1,2 +1,0 @@
-Question: how many drawers are visible
-Answer: 11
