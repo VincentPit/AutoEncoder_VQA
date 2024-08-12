@@ -24,3 +24,4 @@ results
 val2014
 *.pth
 submit*
+*.sh
