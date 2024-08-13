@@ -12,7 +12,7 @@ import random
 import numpy as np
 
 # Import custom models and DataLoader
-from co_decoder_posi import MultiModalModel
+from co_decoder_posi_v2 import MultiModalModel
 from coco_dataloader import CocoVQADataset
 from visual_embed.models import prepare_model
 
