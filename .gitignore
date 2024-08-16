@@ -25,3 +25,5 @@ val2014
 *.pth
 submit*
 *.sh
+coco_dataset
+checkpoints

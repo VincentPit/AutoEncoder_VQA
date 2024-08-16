@@ -34,7 +34,7 @@ class MultiModalModel(nn.Module):
         image_embeddings = self.vit_model.forward(image_tensor)  # Shape: [batch_size, num_patches, 1024]
 
         # Combine text and image embeddings
-        combined_embeddings = torch.cat([text_embeddings, image_embeddings], dim=1)  # Shape: [batch_size, total_seq_len, 1024]
+        combined_embeddings = torch.cat([image_embeddings, text_embeddings], dim=1)  # Shape: [batch_size, total_seq_len, 1024]
         
         # Pad combined embeddings to max_seq_length
         if combined_embeddings.size(1) < self.max_seq_length:
