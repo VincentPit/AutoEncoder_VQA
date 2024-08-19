@@ -1,0 +1,76 @@
+# conda environments:
+#
+base                     /ext3/miniconda3
+MAE_env                  /ext3/miniconda3/envs/MAE_env
+VQA_env                  /ext3/miniconda3/envs/VQA_env
+VQA_v1                   /ext3/miniconda3/envs/VQA_v1
+
+Collecting pycocotools
+  Downloading pycocotools-2.0.7-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.1 kB)
+Requirement already satisfied: matplotlib>=2.1.0 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from pycocotools) (3.7.2)
+Requirement already satisfied: numpy in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from pycocotools) (1.24.3)
+Requirement already satisfied: contourpy>=1.0.1 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (1.0.5)
+Requirement already satisfied: cycler>=0.10 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (0.11.0)
+Requirement already satisfied: fonttools>=4.22.0 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (4.25.0)
+Requirement already satisfied: kiwisolver>=1.0.1 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (1.4.4)
+Requirement already satisfied: packaging>=20.0 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (23.1)
+Requirement already satisfied: pillow>=6.2.0 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (10.0.1)
+Requirement already satisfied: pyparsing<3.1,>=2.3.1 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (3.0.9)
+Requirement already satisfied: python-dateutil>=2.7 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (2.8.2)
+Requirement already satisfied: importlib-resources>=3.2.0 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from matplotlib>=2.1.0->pycocotools) (6.1.0)
+Requirement already satisfied: zipp>=3.1.0 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from importlib-resources>=3.2.0->matplotlib>=2.1.0->pycocotools) (3.11.0)
+Requirement already satisfied: six>=1.5 in /ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages (from python-dateutil>=2.7->matplotlib>=2.1.0->pycocotools) (1.16.0)
+Downloading pycocotools-2.0.7-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (439 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 439.5/439.5 kB 4.5 MB/s eta 0:00:00
+Installing collected packages: pycocotools
+Successfully installed pycocotools-2.0.7
+loading annotations into memory...
+Done (t=0.89s)
+creating index...
+index created!
+Trainable Parameters: ['encoder_layer.self_attn.in_proj_weight', 'encoder_layer.self_attn.in_proj_bias', 'encoder_layer.self_attn.out_proj.weight', 'encoder_layer.self_attn.out_proj.bias', 'encoder_layer.linear1.weight', 'encoder_layer.linear1.bias', 'encoder_layer.linear2.weight', 'encoder_layer.linear2.bias', 'encoder_layer.norm1.weight', 'encoder_layer.norm1.bias', 'encoder_layer.norm2.weight', 'encoder_layer.norm2.bias', 'transformer_encoder.layers.0.self_attn.in_proj_weight', 'transformer_encoder.layers.0.self_attn.in_proj_bias', 'transformer_encoder.layers.0.self_attn.out_proj.weight', 'transformer_encoder.layers.0.self_attn.out_proj.bias', 'transformer_encoder.layers.0.linear1.weight', 'transformer_encoder.layers.0.linear1.bias', 'transformer_encoder.layers.0.linear2.weight', 'transformer_encoder.layers.0.linear2.bias', 'transformer_encoder.layers.0.norm1.weight', 'transformer_encoder.layers.0.norm1.bias', 'transformer_encoder.layers.0.norm2.weight', 'transformer_encoder.layers.0.norm2.bias', 'transformer_encoder.layers.1.self_attn.in_proj_weight', 'transformer_encoder.layers.1.self_attn.in_proj_bias', 'transformer_encoder.layers.1.self_attn.out_proj.weight', 'transformer_encoder.layers.1.self_attn.out_proj.bias', 'transformer_encoder.layers.1.linear1.weight', 'transformer_encoder.layers.1.linear1.bias', 'transformer_encoder.layers.1.linear2.weight', 'transformer_encoder.layers.1.linear2.bias', 'transformer_encoder.layers.1.norm1.weight', 'transformer_encoder.layers.1.norm1.bias', 'transformer_encoder.layers.1.norm2.weight', 'transformer_encoder.layers.1.norm2.bias', 'transformer_encoder.layers.2.self_attn.in_proj_weight', 'transformer_encoder.layers.2.self_attn.in_proj_bias', 'transformer_encoder.layers.2.self_attn.out_proj.weight', 'transformer_encoder.layers.2.self_attn.out_proj.bias', 'transformer_encoder.layers.2.linear1.weight', 'transformer_encoder.layers.2.linear1.bias', 'transformer_encoder.layers.2.linear2.weight', 'transformer_encoder.layers.2.linear2.bias', 'transformer_encoder.layers.2.norm1.weight', 'transformer_encoder.layers.2.norm1.bias', 'transformer_encoder.layers.2.norm2.weight', 'transformer_encoder.layers.2.norm2.bias', 'transformer_encoder.layers.3.self_attn.in_proj_weight', 'transformer_encoder.layers.3.self_attn.in_proj_bias', 'transformer_encoder.layers.3.self_attn.out_proj.weight', 'transformer_encoder.layers.3.self_attn.out_proj.bias', 'transformer_encoder.layers.3.linear1.weight', 'transformer_encoder.layers.3.linear1.bias', 'transformer_encoder.layers.3.linear2.weight', 'transformer_encoder.layers.3.linear2.bias', 'transformer_encoder.layers.3.norm1.weight', 'transformer_encoder.layers.3.norm1.bias', 'transformer_encoder.layers.3.norm2.weight', 'transformer_encoder.layers.3.norm2.bias', 'decoder_layer.self_attn.in_proj_weight', 'decoder_layer.self_attn.in_proj_bias', 'decoder_layer.self_attn.out_proj.weight', 'decoder_layer.self_attn.out_proj.bias', 'decoder_layer.multihead_attn.in_proj_weight', 'decoder_layer.multihead_attn.in_proj_bias', 'decoder_layer.multihead_attn.out_proj.weight', 'decoder_layer.multihead_attn.out_proj.bias', 'decoder_layer.linear1.weight', 'decoder_layer.linear1.bias', 'decoder_layer.linear2.weight', 'decoder_layer.linear2.bias', 'decoder_layer.norm1.weight', 'decoder_layer.norm1.bias', 'decoder_layer.norm2.weight', 'decoder_layer.norm2.bias', 'decoder_layer.norm3.weight', 'decoder_layer.norm3.bias', 'transformer_decoder.layers.0.self_attn.in_proj_weight', 'transformer_decoder.layers.0.self_attn.in_proj_bias', 'transformer_decoder.layers.0.self_attn.out_proj.weight', 'transformer_decoder.layers.0.self_attn.out_proj.bias', 'transformer_decoder.layers.0.multihead_attn.in_proj_weight', 'transformer_decoder.layers.0.multihead_attn.in_proj_bias', 'transformer_decoder.layers.0.multihead_attn.out_proj.weight', 'transformer_decoder.layers.0.multihead_attn.out_proj.bias', 'transformer_decoder.layers.0.linear1.weight', 'transformer_decoder.layers.0.linear1.bias', 'transformer_decoder.layers.0.linear2.weight', 'transformer_decoder.layers.0.linear2.bias', 'transformer_decoder.layers.0.norm1.weight', 'transformer_decoder.layers.0.norm1.bias', 'transformer_decoder.layers.0.norm2.weight', 'transformer_decoder.layers.0.norm2.bias', 'transformer_decoder.layers.0.norm3.weight', 'transformer_decoder.layers.0.norm3.bias', 'transformer_decoder.layers.1.self_attn.in_proj_weight', 'transformer_decoder.layers.1.self_attn.in_proj_bias', 'transformer_decoder.layers.1.self_attn.out_proj.weight', 'transformer_decoder.layers.1.self_attn.out_proj.bias', 'transformer_decoder.layers.1.multihead_attn.in_proj_weight', 'transformer_decoder.layers.1.multihead_attn.in_proj_bias', 'transformer_decoder.layers.1.multihead_attn.out_proj.weight', 'transformer_decoder.layers.1.multihead_attn.out_proj.bias', 'transformer_decoder.layers.1.linear1.weight', 'transformer_decoder.layers.1.linear1.bias', 'transformer_decoder.layers.1.linear2.weight', 'transformer_decoder.layers.1.linear2.bias', 'transformer_decoder.layers.1.norm1.weight', 'transformer_decoder.layers.1.norm1.bias', 'transformer_decoder.layers.1.norm2.weight', 'transformer_decoder.layers.1.norm2.bias', 'transformer_decoder.layers.1.norm3.weight', 'transformer_decoder.layers.1.norm3.bias', 'transformer_decoder.layers.2.self_attn.in_proj_weight', 'transformer_decoder.layers.2.self_attn.in_proj_bias', 'transformer_decoder.layers.2.self_attn.out_proj.weight', 'transformer_decoder.layers.2.self_attn.out_proj.bias', 'transformer_decoder.layers.2.multihead_attn.in_proj_weight', 'transformer_decoder.layers.2.multihead_attn.in_proj_bias', 'transformer_decoder.layers.2.multihead_attn.out_proj.weight', 'transformer_decoder.layers.2.multihead_attn.out_proj.bias', 'transformer_decoder.layers.2.linear1.weight', 'transformer_decoder.layers.2.linear1.bias', 'transformer_decoder.layers.2.linear2.weight', 'transformer_decoder.layers.2.linear2.bias', 'transformer_decoder.layers.2.norm1.weight', 'transformer_decoder.layers.2.norm1.bias', 'transformer_decoder.layers.2.norm2.weight', 'transformer_decoder.layers.2.norm2.bias', 'transformer_decoder.layers.2.norm3.weight', 'transformer_decoder.layers.2.norm3.bias', 'transformer_decoder.layers.3.self_attn.in_proj_weight', 'transformer_decoder.layers.3.self_attn.in_proj_bias', 'transformer_decoder.layers.3.self_attn.out_proj.weight', 'transformer_decoder.layers.3.self_attn.out_proj.bias', 'transformer_decoder.layers.3.multihead_attn.in_proj_weight', 'transformer_decoder.layers.3.multihead_attn.in_proj_bias', 'transformer_decoder.layers.3.multihead_attn.out_proj.weight', 'transformer_decoder.layers.3.multihead_attn.out_proj.bias', 'transformer_decoder.layers.3.linear1.weight', 'transformer_decoder.layers.3.linear1.bias', 'transformer_decoder.layers.3.linear2.weight', 'transformer_decoder.layers.3.linear2.bias', 'transformer_decoder.layers.3.norm1.weight', 'transformer_decoder.layers.3.norm1.bias', 'transformer_decoder.layers.3.norm2.weight', 'transformer_decoder.layers.3.norm2.bias', 'transformer_decoder.layers.3.norm3.weight', 'transformer_decoder.layers.3.norm3.bias']
+Device: cuda
+Epoch [1/40], Loss: 0.0032
+Model checkpoint saved to model_checkpoint_epoch_1.pth
+Epoch [2/40], Loss: 0.0023
+Model checkpoint saved to model_checkpoint_epoch_2.pth
+Epoch [3/40], Loss: 0.0021
+Model checkpoint saved to model_checkpoint_epoch_3.pth
+Epoch [4/40], Loss: 0.0020
+Model checkpoint saved to model_checkpoint_epoch_4.pth
+Epoch [5/40], Loss: 0.0019
+Model checkpoint saved to model_checkpoint_epoch_5.pth
+Epoch [6/40], Loss: 0.0020
+Model checkpoint saved to model_checkpoint_epoch_6.pth
+Epoch [7/40], Loss: 0.0018
+Model checkpoint saved to model_checkpoint_epoch_7.pth
+Epoch [8/40], Loss: 0.0019
+Model checkpoint saved to model_checkpoint_epoch_8.pth
+Epoch [9/40], Loss: 0.0018
+Model checkpoint saved to model_checkpoint_epoch_9.pth
+Epoch [10/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_10.pth
+Epoch [11/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_11.pth
+Epoch [12/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_12.pth
+Epoch [13/40], Loss: 0.0016
+Model checkpoint saved to model_checkpoint_epoch_13.pth
+Epoch [14/40], Loss: 0.0016
+Model checkpoint saved to model_checkpoint_epoch_14.pth
+Epoch [15/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_15.pth
+Epoch [16/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_16.pth
+Epoch [17/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_17.pth
+Epoch [18/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_18.pth
+Epoch [19/40], Loss: 0.0016
+Model checkpoint saved to model_checkpoint_epoch_19.pth
+Epoch [20/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_20.pth
+Epoch [21/40], Loss: 0.0017
+Model checkpoint saved to model_checkpoint_epoch_21.pth
+Epoch [22/40], Loss: 0.0016
+Model checkpoint saved to model_checkpoint_epoch_22.pth

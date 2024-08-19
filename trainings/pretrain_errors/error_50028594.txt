@@ -1,0 +1,8 @@
+/ext3/miniconda3/envs/VQA_v1/lib/python3.8/site-packages/transformers/utils/generic.py:260: FutureWarning: `torch.utils._pytree._register_pytree_node` is deprecated. Please use `torch.utils._pytree.register_pytree_node` instead.
+  torch.utils._pytree._register_pytree_node(
+Traceback (most recent call last):
+  File "pretrain.py", line 9, in <module>
+    from mscoco_dataloader import COCOMatchDataset
+  File "/scratch/jl13122/VQA/visual_question_answer/mscoco_dataloader.py", line 5, in <module>
+    from pycocotools.coco import COCO
+ModuleNotFoundError: No module named 'pycocotools'

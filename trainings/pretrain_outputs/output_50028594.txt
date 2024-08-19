@@ -1,0 +1,7 @@
+# conda environments:
+#
+base                     /ext3/miniconda3
+MAE_env                  /ext3/miniconda3/envs/MAE_env
+VQA_env                  /ext3/miniconda3/envs/VQA_env
+VQA_v1                   /ext3/miniconda3/envs/VQA_v1
+
