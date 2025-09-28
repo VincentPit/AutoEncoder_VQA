@@ -1,0 +1,147 @@
+# AutoEncoder VQA Configuration File
+
+# Model Configuration
+model:
+  # Architecture parameters
+  max_seq_length: 512
+  dropout_rate: 0.1
+  num_attention_heads: 8
+  hidden_size: 768
+  
+  # Cross-attention settings
+  cross_attention_layers: 6
+  vit_projection_dim: 768
+  
+  # Decoder settings
+  decoder_layers: 6
+  vocab_size: 30522  # BERT vocab size
+  
+  # Pre-trained model paths
+  bert_model: "bert-base-uncased"
+  vit_checkpoint: "visual_embed/mae_visualize_vit_large.pth"
+  vit_architecture: "mae_vit_large_patch16"
+
+# Training Configuration
+training:
+  # Basic training parameters
+  batch_size: 16
+  num_epochs: 50
+  learning_rate: 1e-5
+  weight_decay: 0.01
+  
+  # Optimization
+  optimizer: "AdamW"
+  scheduler: "cosine"
+  warmup_steps: 1000
+  gradient_clip_norm: 1.0
+  
+  # Mixed precision training
+  use_amp: true
+  
+  # Gradient accumulation
+  accumulation_steps: 1
+  
+  # Model freezing
+  freeze_bert: true
+  freeze_vit: true
+  
+  # Validation
+  val_interval: 1000
+  save_interval: 5000
+  
+  # Early stopping
+  patience: 10
+  min_delta: 0.001
+
+# Data Configuration
+data:
+  # Dataset paths
+  train_images: "train2014/"
+  val_images: "val2014/"
+  test_images: "test2014/"
+  
+  # Annotation files
+  train_annotations: "v2_mscoco_train2014_annotations.json"
+  val_annotations: "v2_mscoco_val2014_annotations.json"
+  
+  # Question files
+  train_questions: "v2_OpenEnded_mscoco_train2014_questions.json"
+  val_questions: "v2_OpenEnded_mscoco_val2014_questions.json"
+  
+  # Data processing
+  image_size: 224
+  num_workers: 4
+  pin_memory: true
+  
+  # Data augmentation
+  use_augmentation: true
+  horizontal_flip: true
+  color_jitter: true
+
+# Inference Configuration
+inference:
+  # Generation parameters
+  beam_size: 5
+  max_answer_length: 50
+  temperature: 1.0
+  
+  # Output settings
+  skip_special_tokens: true
+  clean_up_tokenization_spaces: true
+
+# Logging Configuration
+logging:
+  # Experiment tracking
+  use_wandb: false
+  project_name: "autoencoder_vqa"
+  experiment_name: "default"
+  
+  # Local logging
+  log_dir: "logs/"
+  log_level: "INFO"
+  
+  # Metrics to track
+  metrics:
+    - "loss"
+    - "accuracy"
+    - "bleu"
+    - "cider"
+
+# Hardware Configuration
+hardware:
+  # Device settings
+  device: "auto"  # auto, cpu, cuda
+  
+  # Multi-GPU
+  use_data_parallel: true
+  
+  # Memory optimization
+  gradient_checkpointing: false
+  
+# Paths Configuration
+paths:
+  # Model checkpoints
+  checkpoint_dir: "checkpoints/"
+  best_model_path: "checkpoints/best_model.pth"
+  
+  # Results and outputs
+  results_dir: "results/"
+  predictions_file: "results/predictions.json"
+  
+  # Cache directories
+  cache_dir: ".cache/"
+  
+# Evaluation Configuration
+evaluation:
+  # Metrics to compute
+  compute_bleu: true
+  compute_cider: true
+  compute_rouge: true
+  
+  # Evaluation settings
+  eval_batch_size: 32
+  save_predictions: true
+  
+  # Visualization
+  save_attention_maps: false
+  num_visualization_samples: 10

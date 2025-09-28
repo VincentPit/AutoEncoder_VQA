@@ -86,7 +86,7 @@ class CocoVQADataset(Dataset):
         question_padded = self.pad_sequence(question_tokenized, self.max_question_length)
         answer_padded = self.pad_sequence(answer_tokenized, self.max_answer_length)
 
-        sample = {
+        return {
             'question': question_padded,
             'answer': answer_padded,
             'image': image,
@@ -94,8 +94,6 @@ class CocoVQADataset(Dataset):
             'answer_text': answer,
             'img_id': img_id
         }
-        
-        return sample
 
     def pad_sequence(self, sequence, max_len, padding_value=0):
         if len(sequence) < max_len:

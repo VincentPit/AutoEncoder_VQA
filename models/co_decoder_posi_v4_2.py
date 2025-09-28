@@ -87,9 +87,8 @@ class MultiModalModel(nn.Module):
         decoder_output = self.dropout(decoder_output)
 
         # Final classification layer
-        output = self.fc_out(decoder_output)  # Shape: [batch_size, target_seq_len, vocab_size]
-
-        return output
+        # Shape: [batch_size, target_seq_len, vocab_size]
+        return self.fc_out(decoder_output)
 
     def generate_answer(self, text_input_ids, text_attention_mask, image_tensor, beam_size=3, max_length=50):
         decoder_input_ids = torch.tensor([[self.tokenizer.cls_token_id]]).to(text_input_ids.device)
@@ -117,8 +116,7 @@ class MultiModalModel(nn.Module):
 
         # Select the sequence with the highest score
         best_seq = beam[0][0]
-        generated_answer = self.tokenizer.decode(best_seq.squeeze(), skip_special_tokens=True)
-        return generated_answer
+        return self.tokenizer.decode(best_seq.squeeze(), skip_special_tokens=True)
 
 if __name__ == "__main__":
     bert_model = BertModel.from_pretrained('bert-base-uncased')
